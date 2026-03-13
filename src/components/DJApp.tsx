@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import {
+  getAudioContext,
   playKick,
   playSnare,
   playHiHat,
@@ -9,16 +10,17 @@ import {
   playTom,
   playCymbal,
   playRim,
+  playRide,
   playScratch,
   playSynthStab,
   playBass,
   playHorn,
+  playMelodyNote,
   startBeat,
   stopBeat,
   setBpm,
   getBpm,
   onBeatStep,
-  getAudioContext,
   setPattern,
   getPatternId,
 } from "@/lib/audioEngine";
@@ -34,6 +36,7 @@ import {
   selectVinyl,
   getSave,
   getSelectedVinyl,
+  unlockAll,
   type SaveData,
 } from "@/lib/progression";
 import {
@@ -42,6 +45,7 @@ import {
   emitScratchParticles,
   emitPadBurst,
   emitUnlockCelebration,
+  emitFloatingNote,
 } from "@/lib/particles";
 
 // ─── Particle Canvas Overlay ────────────────────────────────────────────────
@@ -262,22 +266,25 @@ function TrackPicker({
   open,
   onClose,
   currentTrackId,
+  save,
 }: {
   open: boolean;
   currentTrackId: string;
   onClose: () => void;
+  save: SaveData;
 }) {
-  const currentIdx = TRACKS.findIndex((t) => t.id === currentTrackId);
+  const unlocked = TRACKS.filter((t) => save.unlockedTrackIds.includes(t.id));
+  const currentIdx = unlocked.findIndex((t) => t.id === currentTrackId);
   const [idx, setIdx] = useState(Math.max(0, currentIdx));
   const [flipDir, setFlipDir] = useState(0);
 
   useEffect(() => {
     if (open) {
-      const ci = TRACKS.findIndex((t) => t.id === currentTrackId);
+      const ci = unlocked.findIndex((t) => t.id === currentTrackId);
       setIdx(Math.max(0, ci));
       setFlipDir(0);
     }
-  }, [open, currentTrackId]);
+  }, [open, currentTrackId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!open) return;
@@ -285,14 +292,14 @@ function TrackPicker({
       if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
         e.preventDefault();
         setFlipDir(-1);
-        setIdx((i) => (i > 0 ? i - 1 : TRACKS.length - 1));
+        setIdx((i) => (i > 0 ? i - 1 : unlocked.length - 1));
       } else if (e.key === "ArrowRight" || e.key === "ArrowDown") {
         e.preventDefault();
         setFlipDir(1);
-        setIdx((i) => (i < TRACKS.length - 1 ? i + 1 : 0));
+        setIdx((i) => (i < unlocked.length - 1 ? i + 1 : 0));
       } else if (e.key === "Enter") {
         e.preventDefault();
-        const t = TRACKS[idx];
+        const t = unlocked[idx];
         setPattern(t.id, t.pattern, t.bpm);
         setBpm(t.bpm);
         onClose();
@@ -303,11 +310,11 @@ function TrackPicker({
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [open, idx, onClose]);
+  }, [open, idx, unlocked, onClose]);
 
   if (!open) return null;
 
-  const track = TRACKS[idx];
+  const track = unlocked[idx] || unlocked[0];
   const isActive = track.id === currentTrackId;
 
   return (
@@ -622,18 +629,26 @@ function Turntable({
 // ─── Beat Pads ──────────────────────────────────────────────────────────────
 
 const PAD_CONFIG = [
+  // Row 1: Main drums
   { label: "KICK", fn: playKick, color: "from-red-500 to-orange-600", key: "Q" },
   { label: "SNARE", fn: playSnare, color: "from-sky-500 to-blue-600", key: "W" },
   { label: "HI-HAT", fn: () => playHiHat(false), color: "from-yellow-400 to-amber-500", key: "E" },
   { label: "CLAP", fn: playClap, color: "from-fuchsia-500 to-pink-600", key: "R" },
-  { label: "OPEN HH", fn: () => playHiHat(true), color: "from-amber-400 to-orange-500", key: "A" },
-  { label: "TOM", fn: () => playTom("high"), color: "from-emerald-400 to-green-600", key: "S" },
-  { label: "CYMBAL", fn: playCymbal, color: "from-indigo-400 to-violet-600", key: "D" },
-  { label: "RIM", fn: playRim, color: "from-rose-400 to-red-600", key: "F" },
-  { label: "STAB", fn: () => playSynthStab(0), color: "from-purple-500 to-fuchsia-600", key: "Z" },
-  { label: "STAB +", fn: () => playSynthStab(4), color: "from-violet-500 to-purple-700", key: "X" },
-  { label: "BASS", fn: playBass, color: "from-teal-500 to-cyan-600", key: "C" },
-  { label: "HORN", fn: playHorn, color: "from-pink-400 to-rose-600", key: "V" },
+  { label: "OPEN HH", fn: () => playHiHat(true), color: "from-amber-400 to-orange-500", key: "T" },
+  
+  // Row 2: Toms and cymbals
+  { label: "TOM HIGH", fn: () => playTom("high"), color: "from-emerald-400 to-green-600", key: "A" },
+  { label: "TOM MID", fn: () => playTom("mid"), color: "from-green-400 to-emerald-600", key: "S" },
+  { label: "TOM LOW", fn: () => playTom("low"), color: "from-orange-400 to-red-600", key: "D" },
+  { label: "CYMBAL", fn: playCymbal, color: "from-indigo-400 to-violet-600", key: "F" },
+  { label: "RIDE", fn: () => playRide(false), color: "from-blue-400 to-indigo-600", key: "G" },
+  
+  // Row 3: Melodic/percussion
+  { label: "RIM", fn: playRim, color: "from-rose-400 to-red-600", key: "Z" },
+  { label: "STAB", fn: () => playSynthStab(0), color: "from-purple-500 to-fuchsia-600", key: "X" },
+  { label: "STAB +", fn: () => playSynthStab(4), color: "from-violet-500 to-purple-700", key: "C" },
+  { label: "BASS", fn: playBass, color: "from-teal-500 to-cyan-600", key: "V" },
+  { label: "HORN", fn: playHorn, color: "from-pink-400 to-rose-600", key: "B" },
 ];
 
 function BeatPad({
@@ -641,11 +656,13 @@ function BeatPad({
   fn,
   color,
   hotkey,
+  onKeyPress,
 }: {
   label: string;
   fn: () => void;
   color: string;
   hotkey: string;
+  onKeyPress?: (key: string) => void;
 }) {
   const [active, setActive] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -671,11 +688,14 @@ function BeatPad({
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.repeat) return;
-      if (e.key.toUpperCase() === hotkey) trigger();
+      if (e.key.toUpperCase() === hotkey) {
+        trigger();
+        onKeyPress?.(e.key.toUpperCase());
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [hotkey, trigger]);
+  }, [hotkey, trigger, onKeyPress]);
 
   return (
     <button
@@ -696,10 +716,10 @@ function BeatPad({
   );
 }
 
-function BeatPads() {
+function BeatPads({ onKeyPress }: { onKeyPress?: (key: string) => void }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className="grid grid-cols-4 gap-2">
+      <div className="grid grid-cols-5 gap-2">
         {PAD_CONFIG.map((pad) => (
           <BeatPad
             key={pad.label}
@@ -707,6 +727,7 @@ function BeatPads() {
             fn={pad.fn}
             color={pad.color}
             hotkey={pad.key}
+            onKeyPress={onKeyPress}
           />
         ))}
       </div>
@@ -803,8 +824,24 @@ export default function DJApp() {
   const [trackPickerOpen, setTrackPickerOpen] = useState(false);
   const [trackId, setTrackId] = useState(getPatternId);
   const [unlockVinyl, setUnlockVinyl] = useState<VinylDesign | null>(null);
+  const cheatSequenceRef = useRef<string[]>([]);
 
   const vinyl = getSelectedVinyl();
+
+  // Cheat code detector - type "STAGE" on pads to unlock everything
+  const checkCheatCode = useCallback((key: string) => {
+    cheatSequenceRef.current.push(key);
+    if (cheatSequenceRef.current.length > 5) {
+      cheatSequenceRef.current.shift();
+    }
+    const sequence = cheatSequenceRef.current.join("");
+    if (sequence === "STAGE") {
+      unlockAll();
+      setSave(getSave());
+      emitUnlockCelebration(window.innerWidth / 2, window.innerHeight / 2);
+      cheatSequenceRef.current = [];
+    }
+  }, []);
 
   useEffect(() => {
     loadSave();
@@ -864,6 +901,40 @@ export default function DJApp() {
       } else if (!pickerOpen && !trackPickerOpen && e.key === "ArrowRight") {
         e.preventDefault();
         setBpm(Math.min(200, getBpm() + 2));
+      } else if (!pickerOpen && !trackPickerOpen && /^[0-9]$/.test(e.key)) {
+        // Number keys 1-9, 0 = C major scale notes
+        e.preventDefault();
+        const noteMap: { [key: string]: { semitone: number; name: string } } = {
+          "1": { semitone: 0, name: "C" },
+          "2": { semitone: 2, name: "D" },
+          "3": { semitone: 4, name: "E" },
+          "4": { semitone: 5, name: "F" },
+          "5": { semitone: 7, name: "G" },
+          "6": { semitone: 9, name: "A" },
+          "7": { semitone: 11, name: "B" },
+          "8": { semitone: 12, name: "C" },
+          "9": { semitone: 14, name: "D" },
+          "0": { semitone: 16, name: "E" },
+        };
+        const note = noteMap[e.key];
+        if (note) {
+          getAudioContext();
+          playMelodyNote(note.semitone);
+          // Emit note particle from random position around turntable
+          const centerX = window.innerWidth * 0.3;
+          const centerY = window.innerHeight * 0.5;
+          const radius = 80 + Math.random() * 60;
+          const a = Math.random() * Math.PI * 2;
+          const symbols = ["\u266A", "\u266B", "\u2669"];
+          const label = Math.random() > 0.4
+            ? note.name
+            : symbols[Math.floor(Math.random() * symbols.length)];
+          emitFloatingNote(
+            centerX + Math.cos(a) * radius,
+            centerY + Math.sin(a) * radius,
+            label
+          );
+        }
       }
     };
     window.addEventListener("keydown", handler);
@@ -910,6 +981,7 @@ export default function DJApp() {
       <TrackPicker
         open={trackPickerOpen}
         currentTrackId={trackId}
+        save={save}
         onClose={() => {
           setTrackPickerOpen(false);
           setTrackId(getPatternId());
@@ -929,7 +1001,7 @@ export default function DJApp() {
           <div className="right-panel">
             <BeatSteps />
             <BpmSlider />
-            <BeatPads />
+            <BeatPads onKeyPress={checkCheatCode} />
           </div>
         </div>
       </div>

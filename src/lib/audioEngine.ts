@@ -262,6 +262,67 @@ export function playChordPad(notes: number[] = [0, 4, 7], duration = 0.6) {
   });
 }
 
+// --- Melody note (for number keys) — warm plucky analog synth tone ---
+export function playMelodyNote(note: number) {
+  const c = getAudioContext();
+  const t = c.currentTime;
+  // C4 (261 Hz) base — sits warmly in the mid-range
+  const freq = 261.63 * Math.pow(2, note / 12);
+  const master = getMaster();
+
+  // Main square wave — classic analog synth character
+  const osc1 = c.createOscillator();
+  osc1.type = "square";
+  osc1.frequency.value = freq;
+
+  // Detuned saw for thickness
+  const osc2 = c.createOscillator();
+  osc2.type = "sawtooth";
+  osc2.frequency.value = freq * 1.005;
+
+  const oscMix = c.createGain();
+  oscMix.gain.value = 0.35;
+
+  // Filter sweep — opens on attack, closes for warmth
+  const filter = c.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.frequency.setValueAtTime(3500, t);
+  filter.frequency.exponentialRampToValueAtTime(300, t + 0.6);
+  filter.Q.value = 2;
+
+  // Percussive pluck envelope — sharp attack, smooth decay
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0.18, t);
+  gain.gain.setValueAtTime(0.14, t + 0.02);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.7);
+
+  // Pluck click — short noise burst for tactile attack
+  const clickLen = Math.round(c.sampleRate * 0.008);
+  const clickBuf = c.createBuffer(1, clickLen, c.sampleRate);
+  const clickData = clickBuf.getChannelData(0);
+  for (let i = 0; i < clickLen; i++) {
+    clickData[i] = (Math.random() * 2 - 1) * (1 - i / clickLen);
+  }
+  const click = c.createBufferSource();
+  click.buffer = clickBuf;
+  const clickGain = c.createGain();
+  clickGain.gain.value = 0.06;
+
+  osc1.connect(filter);
+  osc2.connect(oscMix);
+  oscMix.connect(filter);
+  filter.connect(gain);
+  click.connect(clickGain);
+  clickGain.connect(gain);
+  gain.connect(master);
+
+  osc1.start(t);
+  osc1.stop(t + 0.7);
+  osc2.start(t);
+  osc2.stop(t + 0.7);
+  click.start(t);
+}
+
 // --- Ride cymbal ---
 export function playRide(accent = false) {
   const c = getAudioContext();

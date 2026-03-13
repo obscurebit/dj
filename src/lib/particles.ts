@@ -7,7 +7,8 @@ interface Particle {
   maxLife: number;
   size: number;
   color: string;
-  type: "spark" | "ring" | "dot";
+  type: "spark" | "ring" | "dot" | "note";
+  text?: string;
 }
 
 let particles: Particle[] = [];
@@ -75,15 +76,15 @@ export function emitPadBurst(cx: number, cy: number, color: string) {
 }
 
 export function emitUnlockCelebration(cx: number, cy: number) {
-  const colors = ["#a855f7", "#ec4899", "#22d3ee", "#f59e0b", "#22c55e"];
-  for (let i = 0; i < 30; i++) {
+  const colors = ["#ff6b9d", "#c44569", "#f8b500", "#45aaf2", "#a29bfe"];
+  for (let i = 0; i < 50; i++) {
     const angle = Math.random() * Math.PI * 2;
-    const speed = 2 + Math.random() * 6;
+    const speed = 2 + Math.random() * 5;
     particles.push({
       x: cx,
       y: cy,
       vx: Math.cos(angle) * speed,
-      vy: Math.sin(angle) * speed - 2,
+      vy: Math.sin(angle) * speed,
       life: 1,
       maxLife: 1,
       size: 3 + Math.random() * 5,
@@ -91,6 +92,21 @@ export function emitUnlockCelebration(cx: number, cy: number) {
       type: Math.random() > 0.5 ? "spark" : "dot",
     });
   }
+}
+
+export function emitFloatingNote(cx: number, cy: number, note: string) {
+  particles.push({
+    x: cx,
+    y: cy,
+    vx: (Math.random() - 0.5) * 2,
+    vy: -2 - Math.random(),
+    life: 1,
+    maxLife: 1,
+    size: 18,
+    color: "#fff",
+    type: "note",
+    text: note,
+  });
 }
 
 function loop() {
@@ -150,6 +166,12 @@ function loop() {
       ctx2d.lineWidth = p.size * alpha;
       ctx2d.lineCap = "round";
       ctx2d.stroke();
+    } else if (p.type === "note" && p.text) {
+      ctx2d.font = `bold ${p.size}px monospace`;
+      ctx2d.textAlign = "center";
+      ctx2d.textBaseline = "middle";
+      ctx2d.fillStyle = p.color + hexAlpha(alpha * 0.8);
+      ctx2d.fillText(p.text, p.x, p.y);
     } else {
       ctx2d.beginPath();
       ctx2d.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);

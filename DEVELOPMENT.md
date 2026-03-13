@@ -3,7 +3,7 @@
 ## Features
 
 - **Spinning vinyl turntable** — click Play to start the beat, drag the record to scratch
-- **12 sample pads** — drums, percussion, synth stabs, bass, and horn with keyboard shortcuts
+- **15 sample pads** — drums, percussion, synth stabs, bass, and horn with keyboard shortcuts
 - **BPM control** — adjust tempo from 60–200 BPM with slider or arrow keys
 - **Step sequencer display** — visual beat indicator
 - **Vinyl collection** — unlock and switch between 8 themed vinyl skins
@@ -18,7 +18,7 @@
 |--------|-------|
 | Play / Stop | Click button or press **Space** |
 | Scratch | Click & drag the vinyl record |
-| Drum pads | Click pads or press **Q W E R / A S D F / Z X C V** |
+| Drum pads | Click pads or press **Q W E R T / A S D F G / Z X C V B** |
 | Tempo | Drag slider or press **← →** |
 | Vinyl picker | Click swatch or press **Tab** |
 | Track picker | Click music note or press **` (backtick)** |
