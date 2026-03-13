@@ -876,7 +876,7 @@ export default function DJApp() {
         <div className="splash-bg" />
         <div className="splash-content">
           <div className="splash-icon">🎧</div>
-          <h1 className="splash-title">DJ SPINNER</h1>
+          <h1 className="splash-title">OBSCURE DJ</h1>
           <p className="text-white/30 text-sm max-w-xs text-center leading-relaxed">
             Scratch the vinyl, tap the pads, find your groove.
           </p>

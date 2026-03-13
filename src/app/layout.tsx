@@ -13,8 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DJ Spinner",
+  title: "Obscure DJ",
   description: "An interactive cartoon turntable toy — scratch vinyl, tap beats, drop sounds!",
+  icons: {
+    icon: "/vinyl-icon.svg",
+  },
 };
 
 export default function RootLayout({

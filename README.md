@@ -11,7 +11,6 @@ An interactive cartoon turntable toy that brings the joy of DJing to your browse
 - 🎛️ **Control the tempo** with smooth BPM adjustment from 60–200
 - 🎨 **Collect vinyl skins** — unlock 8 themed record designs
 - 🎼 **Switch between genres** — from Lo-fi Hip Hop to Funk and House
-- 💾 **Save your progress** — keeps your unlocks and preferences locally
 
 ## Quick Start
 
