@@ -1,52 +1,28 @@
 # DJ Spinner
 
-An interactive cartoon turntable toy. Scratch the vinyl, smash the beat pads, drop some beats — no music degree required.
+![DJ Spinner](dj.png)
 
-## Features
+An interactive cartoon turntable toy that brings the joy of DJing to your browser. Scratch the vinyl, smash the beat pads, drop some beats — no music degree required.
 
-- **Spinning vinyl turntable** — click Play to start the beat, drag the record to scratch
-- **12 sample pads** — drums, percussion, synth stabs, bass, and horn with keyboard shortcuts
-- **BPM control** — adjust tempo from 60–200 BPM with slider or arrow keys
-- **Step sequencer display** — visual beat indicator
-- **Vinyl collection** — unlock and switch between 8 themed vinyl skins
-- **Genre presets** — 8 procedural backing tracks (Lo-fi Hip Hop, Jazz, Boom Bap, House, Ambient, Funk, Trip Hop)
-- **Crate-digging UI** — flip-through record and track pickers with indie art aesthetic
-- **100% procedural audio** — all sounds generated via the Web Audio API, zero licensed audio
-- **Persistent progression** — saves unlocks and preferences locally
+## What You Can Do
 
-## Controls
+- 🎵 **Spin and scratch** virtual vinyl records with realistic turntable physics
+- 🥁 **Play 12 sample pads** featuring drums, percussion, synths, bass, and horns
+- 🎛️ **Control the tempo** with smooth BPM adjustment from 60–200
+- 🎨 **Collect vinyl skins** — unlock 8 themed record designs
+- 🎼 **Switch between genres** — from Lo-fi Hip Hop to Funk and House
+- 💾 **Save your progress** — keeps your unlocks and preferences locally
 
-| Action | Input |
-|--------|-------|
-| Play / Stop | Click button or press **Space** |
-| Scratch | Click & drag the vinyl record |
-| Drum pads | Click pads or press **Q W E R / A S D F / Z X C V** |
-| Tempo | Drag slider or press **← →** |
-| Vinyl picker | Click swatch or press **Tab** |
-| Track picker | Click music note or press **` (backtick)** |
+## Quick Start
 
-## Getting Started
+Click Play to start the beat, then:
+- Drag the record to scratch
+- Hit the drum pads (or use keyboard shortcuts)
+- Adjust tempo with the slider
+- Switch vinyls and tracks to explore different sounds
 
-```bash
-npm install
-npm run dev
-```
+**Try it now:** [dj.obscurebit.com](https://dj.obscurebit.com)
 
-Open [http://localhost:3000](http://localhost:3000).
+## For Developers
 
-## Deployment
-
-This app is configured for GitHub Pages deployment at `dj.obscurebit.com`:
-
-1. Push to the `main` branch
-2. GitHub Actions will automatically build and deploy
-3. Visit `https://[username].github.io/dj/` or your custom domain
-
-The static build outputs to `/out` and uses the `/dj` base path.
-
-## Tech Stack
-
-- Next.js + React + TypeScript
-- Tailwind CSS
-- Web Audio API (all sounds procedurally generated)
-- GitHub Pages for static hosting
+Technical details, setup instructions, and deployment info are available in **[DEVELOPMENT.md](DEVELOPMENT.md)**.
