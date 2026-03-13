@@ -204,6 +204,87 @@ export function playScratch(direction: number, intensity: number) {
   osc.stop(c.currentTime + duration);
 }
 
+// --- Pitched bass note ---
+export function playBassNote(note: number = 0) {
+  const c = getAudioContext();
+  const t = c.currentTime;
+  const freq = 55 * Math.pow(2, note / 12); // A1 base
+  const osc = c.createOscillator();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(freq, t);
+  const sub = c.createOscillator();
+  sub.type = "triangle";
+  sub.frequency.setValueAtTime(freq, t);
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0.35, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+  const lp = c.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 400;
+  osc.connect(lp);
+  sub.connect(lp);
+  lp.connect(gain);
+  gain.connect(getMaster());
+  osc.start(t);
+  osc.stop(t + 0.35);
+  sub.start(t);
+  sub.stop(t + 0.35);
+}
+
+// --- Chord pad ---
+export function playChordPad(notes: number[] = [0, 4, 7], duration = 0.6) {
+  const c = getAudioContext();
+  const t = c.currentTime;
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0.08, t);
+  gain.gain.setValueAtTime(0.08, t + duration * 0.7);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+  const lp = c.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.setValueAtTime(2000, t);
+  lp.frequency.exponentialRampToValueAtTime(600, t + duration);
+  lp.connect(gain);
+  gain.connect(getMaster());
+  notes.forEach((note) => {
+    const freq = 261.63 * Math.pow(2, note / 12); // C4 base
+    const osc = c.createOscillator();
+    osc.type = "sawtooth";
+    osc.frequency.value = freq;
+    const osc2 = c.createOscillator();
+    osc2.type = "sawtooth";
+    osc2.frequency.value = freq * 1.004;
+    osc.connect(lp);
+    osc2.connect(lp);
+    osc.start(t);
+    osc.stop(t + duration);
+    osc2.start(t);
+    osc2.stop(t + duration);
+  });
+}
+
+// --- Ride cymbal ---
+export function playRide(accent = false) {
+  const c = getAudioContext();
+  const t = c.currentTime;
+  const bufLen = c.sampleRate * 0.3;
+  const buf = c.createBuffer(1, bufLen, c.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < bufLen; i++) d[i] = (Math.random() * 2 - 1) * 0.5;
+  const src = c.createBufferSource();
+  src.buffer = buf;
+  const bp = c.createBiquadFilter();
+  bp.type = "bandpass";
+  bp.frequency.value = 8000;
+  bp.Q.value = 1.5;
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(accent ? 0.15 : 0.08, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + (accent ? 0.25 : 0.12));
+  src.connect(bp);
+  bp.connect(gain);
+  gain.connect(getMaster());
+  src.start(t);
+}
+
 // --- Simple looping beat sequencer ---
 
 type BeatCallback = (step: number) => void;
@@ -231,12 +312,34 @@ const defaultPattern: Array<() => void>[] = [
   [],
 ];
 
+let activePattern: Array<() => void>[] = defaultPattern;
+let activePatternId: string = "default";
 let beatCallbacks: BeatCallback[] = [];
+let patternChangeCallbacks: Array<(id: string) => void> = [];
 
 export function onBeatStep(cb: BeatCallback) {
   beatCallbacks.push(cb);
   return () => {
     beatCallbacks = beatCallbacks.filter((c) => c !== cb);
+  };
+}
+
+export function setPattern(id: string, pattern: Array<() => void>[], newBpm?: number) {
+  activePatternId = id;
+  activePattern = pattern;
+  if (newBpm) bpm = newBpm;
+  patternChangeCallbacks.forEach((cb) => cb(id));
+  if (isBeatPlaying()) startBeat();
+}
+
+export function getPatternId() {
+  return activePatternId;
+}
+
+export function onPatternChange(cb: (id: string) => void) {
+  patternChangeCallbacks.push(cb);
+  return () => {
+    patternChangeCallbacks = patternChangeCallbacks.filter((c) => c !== cb);
   };
 }
 
@@ -246,9 +349,9 @@ export function startBeat(newBpm?: number) {
   currentStep = 0;
   const stepTime = (60 / bpm / 4) * 1000; // 16th notes
   beatInterval = setInterval(() => {
-    const fns = defaultPattern[currentStep % defaultPattern.length];
+    const fns = activePattern[currentStep % activePattern.length];
     fns.forEach((fn) => fn());
-    beatCallbacks.forEach((cb) => cb(currentStep % defaultPattern.length));
+    beatCallbacks.forEach((cb) => cb(currentStep % activePattern.length));
     currentStep++;
   }, stepTime);
 }
@@ -301,4 +404,92 @@ export function playSynthStab(note: number = 0) {
   osc1.stop(c.currentTime + 0.3);
   osc2.start(c.currentTime);
   osc2.stop(c.currentTime + 0.3);
+}
+
+// --- Deep bass hit ---
+export function playBass() {
+  const c = getAudioContext();
+  const t = c.currentTime;
+  // Sub oscillator
+  const sub = c.createOscillator();
+  sub.type = "sine";
+  sub.frequency.setValueAtTime(55, t);
+  sub.frequency.exponentialRampToValueAtTime(40, t + 0.5);
+  // Harmonics layer
+  const mid = c.createOscillator();
+  mid.type = "triangle";
+  mid.frequency.setValueAtTime(110, t);
+  mid.frequency.exponentialRampToValueAtTime(80, t + 0.4);
+  // Waveshaper for warmth
+  const shaper = c.createWaveShaper();
+  const curve = new Float32Array(256);
+  for (let i = 0; i < 256; i++) {
+    const x = (i / 128) - 1;
+    curve[i] = Math.tanh(x * 2);
+  }
+  shaper.curve = curve;
+  // Gain envelope
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0.5, t);
+  gain.gain.setValueAtTime(0.5, t + 0.1);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
+  // Low pass to keep it round
+  const lp = c.createBiquadFilter();
+  lp.type = "lowpass";
+  lp.frequency.value = 200;
+  lp.Q.value = 1;
+  sub.connect(shaper);
+  mid.connect(shaper);
+  shaper.connect(lp);
+  lp.connect(gain);
+  gain.connect(getMaster());
+  sub.start(t);
+  sub.stop(t + 0.6);
+  mid.start(t);
+  mid.stop(t + 0.6);
+}
+
+// --- Brass horn stab ---
+export function playHorn() {
+  const c = getAudioContext();
+  const t = c.currentTime;
+  const freq = 349; // F4 — brassy
+  // Two detuned sawtooths for thickness
+  const osc1 = c.createOscillator();
+  osc1.type = "sawtooth";
+  osc1.frequency.value = freq;
+  const osc2 = c.createOscillator();
+  osc2.type = "sawtooth";
+  osc2.frequency.value = freq * 1.003;
+  const osc3 = c.createOscillator();
+  osc3.type = "sawtooth";
+  osc3.frequency.value = freq * 2; // octave up
+  // Brass-like attack: filter opens fast then closes
+  const filter = c.createBiquadFilter();
+  filter.type = "lowpass";
+  filter.Q.value = 3;
+  filter.frequency.setValueAtTime(400, t);
+  filter.frequency.exponentialRampToValueAtTime(4000, t + 0.04);
+  filter.frequency.exponentialRampToValueAtTime(1200, t + 0.4);
+  // Gain: punchy attack, medium sustain
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0.001, t);
+  gain.gain.linearRampToValueAtTime(0.25, t + 0.03);
+  gain.gain.setValueAtTime(0.25, t + 0.15);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+  // Octave layer quieter
+  const octGain = c.createGain();
+  octGain.gain.value = 0.08;
+  osc1.connect(filter);
+  osc2.connect(filter);
+  osc3.connect(octGain);
+  octGain.connect(filter);
+  filter.connect(gain);
+  gain.connect(getMaster());
+  osc1.start(t);
+  osc1.stop(t + 0.5);
+  osc2.start(t);
+  osc2.stop(t + 0.5);
+  osc3.start(t);
+  osc3.stop(t + 0.5);
 }

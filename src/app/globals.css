@@ -545,3 +545,449 @@ body {
     0 0 8px rgba(168, 85, 247, 0.5),
     0 2px 6px rgba(0, 0, 0, 0.3);
 }
+
+/* ─── Unlock Notice (ambient glow) ─────────────── */
+
+.unlock-notice {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  cursor: pointer;
+  animation: unlockFadeIn 0.8s ease forwards;
+}
+
+@keyframes unlockFadeIn {
+  0% { opacity: 0; transform: translateX(-50%) translateY(12px); }
+  15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  85% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+}
+
+.unlock-notice-glow {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  opacity: 0.15;
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.unlock-notice-content {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  background: rgba(15, 15, 25, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  backdrop-filter: blur(12px);
+}
+
+.unlock-notice-swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.unlock-notice-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.05em;
+}
+
+/* ─── Vinyl Picker (crate flip-through) ────────── */
+
+.vinyl-picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.crate-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.crate-stage {
+  position: relative;
+  width: 180px;
+  height: 220px;
+  perspective: 600px;
+}
+
+/* Sleeve edges peeking behind */
+.crate-peek {
+  position: absolute;
+  width: 160px;
+  height: 200px;
+  bottom: 0;
+  border-radius: 4px;
+  background: #15152a;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.crate-peek-left {
+  left: -6px;
+  transform: rotate(-2deg);
+  opacity: 0.5;
+  z-index: 0;
+}
+
+.crate-peek-right {
+  right: -6px;
+  transform: rotate(2deg);
+  opacity: 0.3;
+  z-index: 0;
+}
+
+/* Main sleeve */
+.crate-sleeve-main {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Flip animations */
+.crate-flip-in {
+  animation: crateFlipIn 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.crate-flip-left {
+  animation: crateFlipFromRight 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+.crate-flip-right {
+  animation: crateFlipFromLeft 0.3s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes crateFlipIn {
+  0% { opacity: 0; transform: scale(0.95); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes crateFlipFromRight {
+  0% { opacity: 0; transform: translateX(40px) rotateY(-12deg) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) rotateY(0) scale(1); }
+}
+
+@keyframes crateFlipFromLeft {
+  0% { opacity: 0; transform: translateX(-40px) rotateY(12deg) scale(0.95); }
+  100% { opacity: 1; transform: translateX(0) rotateY(0) scale(1); }
+}
+
+/* Album art sleeve */
+.crate-art {
+  width: 168px;
+  height: 168px;
+  border-radius: 6px;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.crate-art-circle {
+  position: absolute;
+  border-radius: 50%;
+}
+
+.crate-art-circle-1 {
+  width: 120px;
+  height: 120px;
+  top: -20px;
+  right: -20px;
+}
+
+.crate-art-circle-2 {
+  width: 80px;
+  height: 80px;
+  bottom: -10px;
+  left: -10px;
+}
+
+.crate-art-lines {
+  position: absolute;
+  inset: 0;
+}
+
+.crate-art-line {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: white;
+}
+
+.crate-art-title {
+  position: absolute;
+  bottom: 12px;
+  left: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+/* Vinyl disc peeking out top */
+.crate-disc-peek {
+  position: absolute;
+  top: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: -1;
+}
+
+.crate-disc {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  position: relative;
+  box-shadow:
+    0 -2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.crate-disc-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #12121f;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.crate-disc-groove {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  pointer-events: none;
+}
+
+.crate-disc-groove-1 {
+  width: 44px;
+  height: 44px;
+  transform: translate(-50%, -50%);
+}
+
+.crate-disc-groove-2 {
+  width: 66px;
+  height: 66px;
+  transform: translate(-50%, -50%);
+}
+
+.crate-disc-groove-3 {
+  width: 88px;
+  height: 88px;
+  transform: translate(-50%, -50%);
+}
+
+/* Navigation */
+.crate-nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.crate-nav-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.crate-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.crate-select-btn {
+  padding: 8px 24px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.crate-select-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.crate-select-active {
+  background: rgba(168, 85, 247, 0.12);
+  border-color: rgba(168, 85, 247, 0.2);
+  color: rgba(168, 85, 247, 0.7);
+}
+
+/* Dots */
+.crate-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.crate-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  transition: all 0.2s ease;
+}
+
+.crate-dot-active {
+  width: 8px;
+  height: 8px;
+  box-shadow: 0 0 6px rgba(168, 85, 247, 0.3);
+}
+
+/* ─── Track Name Indicator ─────────────────────── */
+
+.track-name-indicator {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.18);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: -2px;
+}
+
+/* ─── Track Picker Art ─────────────────────────── */
+
+.track-art-shapes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.track-art-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.track-art-genre {
+  position: absolute;
+  top: 12px;
+  left: 14px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.track-bpm-badge {
+  margin-top: 8px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.25);
+  letter-spacing: 0.06em;
+  text-align: center;
+}
+
+/* ─── GitHub Link ─────────────────────────────── */
+
+.github-link {
+  position: fixed;
+  bottom: 12px;
+  right: 12px;
+  z-index: 10;
+}
+
+.github-link-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.2s ease;
+}
+
+.github-link-inner:hover {
+  color: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.github-link-text {
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.github-link-icon {
+  opacity: 0.6;
+}
+
+/* ─── Picker Button ────────────────────────────── */
+
+.picker-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.picker-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: scale(1.06);
+}
+
+.picker-btn-swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
