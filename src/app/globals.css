@@ -1,0 +1,308 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0a12;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ─── Vinyl Turntable ──────────────────────────── */
+
+.vinyl-container {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  cursor: grab;
+  position: relative;
+}
+
+.vinyl-container:active {
+  cursor: grabbing;
+}
+
+.vinyl-record {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #1a1a2e 0%,
+    #111 18%,
+    #1a1a2e 19%,
+    #0d0d1a 22%,
+    #1a1a2e 25%,
+    #0d0d1a 28%,
+    #1a1a2e 31%,
+    #0d0d1a 34%,
+    #1a1a2e 37%,
+    #0d0d1a 40%,
+    #1a1a2e 43%,
+    #0d0d1a 46%,
+    #1a1a2e 49%,
+    #0d0d1a 52%,
+    #1a1a2e 55%,
+    #0d0d1a 58%,
+    #111 100%
+  );
+  box-shadow:
+    0 0 40px rgba(168, 85, 247, 0.2),
+    0 0 80px rgba(168, 85, 247, 0.1),
+    inset 0 0 30px rgba(0, 0, 0, 0.5);
+  position: relative;
+  will-change: transform;
+}
+
+.vinyl-grooves {
+  position: absolute;
+  inset: 8px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow:
+    inset 0 0 0 12px rgba(255, 255, 255, 0.01),
+    inset 0 0 0 24px rgba(255, 255, 255, 0.015),
+    inset 0 0 0 36px rgba(255, 255, 255, 0.01),
+    inset 0 0 0 48px rgba(255, 255, 255, 0.015),
+    inset 0 0 0 60px rgba(255, 255, 255, 0.01),
+    inset 0 0 0 72px rgba(255, 255, 255, 0.015),
+    inset 0 0 0 84px rgba(255, 255, 255, 0.01);
+}
+
+.vinyl-label {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #ec4899, #f59e0b);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.vinyl-label::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0a0a12;
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+}
+
+.vinyl-label-text {
+  font-size: 18px;
+  font-weight: 900;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  letter-spacing: 3px;
+  position: absolute;
+  top: 14px;
+}
+
+.vinyl-shine {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.08) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  pointer-events: none;
+}
+
+/* ─── Tonearm ──────────────────────────────────── */
+
+.tonearm {
+  position: absolute;
+  top: -8px;
+  right: 30px;
+  width: 6px;
+  height: 140px;
+  background: linear-gradient(to bottom, #888, #555);
+  border-radius: 3px;
+  transform-origin: top center;
+  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  z-index: 10;
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.tonearm::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #aaa, #666);
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+}
+
+.tonearm::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 8px;
+  background: #444;
+  border-radius: 0 0 4px 4px;
+}
+
+/* ─── Play Button ──────────────────────────────── */
+
+.play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 28px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+}
+
+.play-btn:active {
+  transform: scale(0.95);
+}
+
+/* ─── Beat Pads ────────────────────────────────── */
+
+.beat-pad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.08s ease;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.beat-pad::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    transparent 50%
+  );
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.beat-pad:active,
+.beat-pad.scale-90 {
+  box-shadow:
+    0 1px 4px rgba(0, 0, 0, 0.3),
+    0 0 20px rgba(255, 255, 255, 0.15);
+}
+
+/* ─── BPM Slider ───────────────────────────────── */
+
+.bpm-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #a855f7, #22d3ee);
+  outline: none;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.bpm-slider:hover {
+  opacity: 1;
+}
+
+.bpm-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow:
+    0 0 10px rgba(168, 85, 247, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.1s;
+}
+
+.bpm-slider::-webkit-slider-thumb:active {
+  transform: scale(1.2);
+}
+
+.bpm-slider::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+  box-shadow:
+    0 0 10px rgba(168, 85, 247, 0.5),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* ─── Fun background gradient ──────────────────── */
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 50%, rgba(34, 211, 238, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#__next,
+main,
+body > div {
+  position: relative;
+  z-index: 1;
+}
