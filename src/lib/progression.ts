@@ -1,5 +1,6 @@
 import VINYL_DESIGNS, { type VinylDesign } from "./vinylDesigns";
 import TRACKS, { type Track } from "./tracks";
+import VINYL_ART, { type VinylArtDef } from "./vinylArt";
 
 const STORAGE_KEY = "dj-spinner-save";
 
@@ -11,6 +12,8 @@ export interface SaveData {
   unlockedVinylIds: string[];
   selectedVinylId: string;
   unlockedTrackIds: string[];
+  unlockedArtIds: string[];
+  selectedArtId: string;
 }
 
 const DEFAULT_SAVE: SaveData = {
@@ -30,12 +33,15 @@ const DEFAULT_SAVE: SaveData = {
     "velvet-strut",
     "midnight-express",
   ],
+  unlockedArtIds: ["dj"],
+  selectedArtId: "dj",
 };
 
 let save: SaveData = { ...DEFAULT_SAVE };
 let listeners: Array<(s: SaveData) => void> = [];
 let unlockListeners: Array<(v: VinylDesign) => void> = [];
 let trackUnlockListeners: Array<(t: Track) => void> = [];
+let artUnlockListeners: Array<(a: VinylArtDef) => void> = [];
 
 export function loadSave(): SaveData {
   if (typeof window === "undefined") return save;
@@ -77,6 +83,11 @@ export function onTrackUnlock(cb: (t: Track) => void) {
   return () => { trackUnlockListeners = trackUnlockListeners.filter((l) => l !== cb); };
 }
 
+export function onArtUnlock(cb: (a: VinylArtDef) => void) {
+  artUnlockListeners.push(cb);
+  return () => { artUnlockListeners = artUnlockListeners.filter((l) => l !== cb); };
+}
+
 function checkUnlocks() {
   // Check vinyl unlocks
   for (const design of VINYL_DESIGNS) {
@@ -99,6 +110,17 @@ function checkUnlocks() {
     ) {
       save.unlockedTrackIds.push(track.id);
       trackUnlockListeners.forEach((cb) => cb(track));
+    }
+  }
+
+  // Check vinyl art unlocks
+  for (const art of VINYL_ART) {
+    if (
+      !save.unlockedArtIds.includes(art.id) &&
+      save.xp >= art.unlockAt
+    ) {
+      save.unlockedArtIds.push(art.id);
+      artUnlockListeners.forEach((cb) => cb(art));
     }
   }
 }
@@ -142,13 +164,22 @@ export function getSave(): SaveData {
   return { ...save };
 }
 
+export function selectArt(id: string) {
+  if (save.unlockedArtIds.includes(id)) {
+    save.selectedArtId = id;
+    persist();
+    notify();
+  }
+}
+
+export function getSelectedArt(): string {
+  return save.selectedArtId || "dj";
+}
+
 export function unlockAll() {
-  // Unlock all vinyls
   save.unlockedVinylIds = VINYL_DESIGNS.map((v) => v.id);
-  
-  // Unlock all tracks
   save.unlockedTrackIds = TRACKS.map((t) => t.id);
-  
+  save.unlockedArtIds = VINYL_ART.map((a) => a.id);
   persist();
   notify();
 }
