@@ -1,3 +1,4 @@
+import mixpanel from "mixpanel-browser";
 import VINYL_DESIGNS, { type VinylDesign } from "./vinylDesigns";
 import TRACKS, { type Track } from "./tracks";
 import VINYL_ART, { type VinylArtDef } from "./vinylArt";
@@ -154,6 +155,10 @@ export function recordBeatStep() {
 
 export function selectVinyl(id: string) {
   if (save.unlockedVinylIds.includes(id)) {
+    mixpanel.track("Vinyl Selected", { 
+      vinyl_id: id, 
+      vinyl_name: VINYL_DESIGNS.find(v => v.id === id)?.name 
+    });
     save.selectedVinylId = id;
     persist();
     notify();

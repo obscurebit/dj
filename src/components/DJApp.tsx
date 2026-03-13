@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useCallback, useEffect } from "react";
+import mixpanel from "mixpanel-browser";
 import {
   getAudioContext,
   playKick,
@@ -50,6 +51,16 @@ import {
   emitUnlockCelebration,
   emitFloatingNote,
 } from "@/lib/particles";
+
+// ─── Mixpanel Initialization ───────────────────────────────────────────────
+
+mixpanel.init("3463d9169d176f3de1af6a2384b48bc5", {
+  debug: true,
+  track_pageview: true,
+  persistence: "localStorage",
+  autocapture: true,
+  record_sessions_percent: 100,
+});
 
 // ─── Particle Canvas Overlay ────────────────────────────────────────────────
 
@@ -891,6 +902,7 @@ export default function DJApp() {
   }, []);
 
   const handleStart = () => {
+    mixpanel.track("Session Started");
     getAudioContext();
     setStarted(true);
     sessionStorage.setItem("dj-started", "1");
@@ -904,6 +916,7 @@ export default function DJApp() {
   const toggleSpin = useCallback(() => {
     setSpinning((prev) => {
       const next = !prev;
+      mixpanel.track("Toggle Spin", { spinning: next });
       if (next) startBeat();
       else stopBeat();
       sessionStorage.setItem("dj-spinning", next ? "1" : "0");
