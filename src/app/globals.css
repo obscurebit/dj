@@ -3,6 +3,10 @@
 :root {
   --background: #0a0a12;
   --foreground: #ededed;
+  --neon-purple: #a855f7;
+  --neon-pink: #ec4899;
+  --neon-cyan: #22d3ee;
+  --neon-amber: #f59e0b;
 }
 
 @theme inline {
@@ -12,19 +16,209 @@
   --font-mono: var(--font-geist-mono);
 }
 
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
   overflow: hidden;
   user-select: none;
+  min-height: 100dvh;
 }
 
-/* ─── Vinyl Turntable ──────────────────────────── */
+/* ─── Splash Screen ────────────────────────────── */
+
+.splash-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.splash-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 70% 80%, rgba(34, 211, 238, 0.1) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(236, 72, 153, 0.08) 0%, transparent 60%);
+  animation: bgPulse 4s ease-in-out infinite alternate;
+}
+
+@keyframes bgPulse {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+.splash-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  z-index: 1;
+  padding: 2rem;
+}
+
+.splash-icon {
+  font-size: 4rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.splash-title {
+  font-size: clamp(3rem, 10vw, 5rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, #a855f7, #ec4899, #22d3ee, #f59e0b);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientShift 3s ease infinite;
+  line-height: 1.1;
+  text-align: center;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.splash-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  color: white;
+  font-weight: 900;
+  font-size: 1.1rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: none;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow:
+    0 0 30px rgba(168, 85, 247, 0.35),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.splash-btn:hover {
+  transform: scale(1.06);
+  box-shadow:
+    0 0 50px rgba(168, 85, 247, 0.5),
+    0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.splash-btn:active {
+  transform: scale(0.96);
+}
+
+/* ─── App Layout ───────────────────────────────── */
+
+.app-container {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.app-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 25% 40%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 75% 60%, rgba(34, 211, 238, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 90%, rgba(236, 72, 153, 0.05) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.app-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  z-index: 1;
+  padding: 1rem;
+  width: 100%;
+  max-width: 900px;
+}
+
+.main-layout {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .main-layout {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 3rem;
+  }
+}
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+  max-width: 320px;
+}
+
+/* ─── Deck Base ────────────────────────────────── */
+
+.deck-base {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  background: linear-gradient(145deg, #1a1a2e, #12121f);
+  border-radius: 20px;
+  padding: 20px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Platter ──────────────────────────────────── */
+
+.platter {
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #222238 0%, #1a1a2e 100%);
+  box-shadow:
+    0 0 0 3px rgba(255, 255, 255, 0.04),
+    inset 0 0 20px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Vinyl Record ─────────────────────────────── */
 
 .vinyl-container {
-  width: 280px;
-  height: 280px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
   cursor: grab;
   position: relative;
@@ -35,50 +229,59 @@ body {
 }
 
 .vinyl-record {
-  width: 280px;
-  height: 280px;
+  width: 240px;
+  height: 240px;
   border-radius: 50%;
   background: radial-gradient(
     circle,
     #1a1a2e 0%,
-    #111 18%,
-    #1a1a2e 19%,
-    #0d0d1a 22%,
-    #1a1a2e 25%,
-    #0d0d1a 28%,
-    #1a1a2e 31%,
-    #0d0d1a 34%,
-    #1a1a2e 37%,
-    #0d0d1a 40%,
-    #1a1a2e 43%,
-    #0d0d1a 46%,
-    #1a1a2e 49%,
-    #0d0d1a 52%,
-    #1a1a2e 55%,
-    #0d0d1a 58%,
-    #111 100%
+    #111118 16%,
+    #18182a 17%,
+    #0e0e1a 20%,
+    #18182a 23%,
+    #0e0e1a 26%,
+    #18182a 29%,
+    #0e0e1a 32%,
+    #18182a 35%,
+    #0e0e1a 38%,
+    #18182a 41%,
+    #0e0e1a 44%,
+    #18182a 47%,
+    #0e0e1a 50%,
+    #18182a 53%,
+    #0e0e1a 56%,
+    #111118 100%
   );
-  box-shadow:
-    0 0 40px rgba(168, 85, 247, 0.2),
-    0 0 80px rgba(168, 85, 247, 0.1),
-    inset 0 0 30px rgba(0, 0, 0, 0.5);
   position: relative;
   will-change: transform;
+  transition: box-shadow 0.3s ease;
+}
+
+.vinyl-glow {
+  box-shadow:
+    0 0 30px rgba(168, 85, 247, 0.25),
+    0 0 60px rgba(168, 85, 247, 0.1);
+}
+
+.vinyl-scratch-flash {
+  box-shadow:
+    0 0 40px rgba(34, 211, 238, 0.5),
+    0 0 80px rgba(34, 211, 238, 0.2) !important;
 }
 
 .vinyl-grooves {
   position: absolute;
-  inset: 8px;
+  inset: 6px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.02);
   box-shadow:
-    inset 0 0 0 12px rgba(255, 255, 255, 0.01),
-    inset 0 0 0 24px rgba(255, 255, 255, 0.015),
-    inset 0 0 0 36px rgba(255, 255, 255, 0.01),
-    inset 0 0 0 48px rgba(255, 255, 255, 0.015),
-    inset 0 0 0 60px rgba(255, 255, 255, 0.01),
-    inset 0 0 0 72px rgba(255, 255, 255, 0.015),
-    inset 0 0 0 84px rgba(255, 255, 255, 0.01);
+    inset 0 0 0 10px rgba(255, 255, 255, 0.008),
+    inset 0 0 0 20px rgba(255, 255, 255, 0.012),
+    inset 0 0 0 30px rgba(255, 255, 255, 0.008),
+    inset 0 0 0 40px rgba(255, 255, 255, 0.012),
+    inset 0 0 0 50px rgba(255, 255, 255, 0.008),
+    inset 0 0 0 60px rgba(255, 255, 255, 0.012),
+    inset 0 0 0 70px rgba(255, 255, 255, 0.008);
 }
 
 .vinyl-label {
@@ -86,36 +289,47 @@ body {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 80px;
-  height: 80px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   background: linear-gradient(135deg, #a855f7, #ec4899, #f59e0b);
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0;
   box-shadow:
-    0 0 20px rgba(168, 85, 247, 0.4),
-    inset 0 2px 4px rgba(255, 255, 255, 0.3);
+    0 0 16px rgba(168, 85, 247, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.25);
 }
 
 .vinyl-label::after {
   content: "";
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #0a0a12;
-  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.15);
 }
 
 .vinyl-label-text {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 900;
   color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   letter-spacing: 3px;
-  position: absolute;
-  top: 14px;
+  line-height: 1;
+  margin-top: -6px;
+}
+
+.vinyl-label-sub {
+  font-size: 6px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 1px;
 }
 
 .vinyl-shine {
@@ -124,53 +338,51 @@ body {
   border-radius: 50%;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.08) 0%,
-    transparent 40%,
-    transparent 60%,
-    rgba(255, 255, 255, 0.03) 100%
+    rgba(255, 255, 255, 0.07) 0%,
+    transparent 35%,
+    transparent 65%,
+    rgba(255, 255, 255, 0.02) 100%
   );
   pointer-events: none;
 }
 
 /* ─── Tonearm ──────────────────────────────────── */
 
-.tonearm {
+.tonearm-wrapper {
   position: absolute;
-  top: -8px;
-  right: 30px;
-  width: 6px;
-  height: 140px;
-  background: linear-gradient(to bottom, #888, #555);
-  border-radius: 3px;
-  transform-origin: top center;
-  transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  top: 14px;
+  right: 22px;
+  transform-origin: 50% 6px;
+  transition: transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
   z-index: 10;
-  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
 }
 
-.tonearm::before {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  transform: translateX(-50%);
+.tonearm-pivot {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: radial-gradient(circle, #aaa, #666);
-  box-shadow: 0 0 6px rgba(0, 0, 0, 0.5);
+  background: radial-gradient(circle, #bbb, #777);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  margin: 0 auto;
 }
 
-.tonearm::after {
-  content: "";
-  position: absolute;
-  bottom: -4px;
-  left: 50%;
-  transform: translateX(-50%);
+.tonearm-arm {
+  width: 5px;
+  height: 110px;
+  background: linear-gradient(to bottom, #999, #666);
+  border-radius: 2px;
+  margin: -2px auto 0;
+  box-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+.tonearm-head {
   width: 12px;
-  height: 8px;
-  background: #444;
-  border-radius: 0 0 4px 4px;
+  height: 10px;
+  background: #555;
+  border-radius: 0 0 3px 3px;
+  margin: 0 auto;
+  box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.4);
 }
 
 /* ─── Play Button ──────────────────────────────── */
@@ -179,23 +391,33 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 28px;
+  gap: 0.5rem;
+  padding: 10px 24px;
   border-radius: 9999px;
-  background: linear-gradient(135deg, #a855f7, #ec4899);
+  background: linear-gradient(135deg, #333, #222);
   color: white;
-  border: none;
+  border: 2px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
   transition: all 0.15s ease;
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 .play-btn:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.5);
+  border-color: rgba(168, 85, 247, 0.3);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.2);
 }
 
 .play-btn:active {
   transform: scale(0.95);
+}
+
+.play-btn-active {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow:
+    0 0 20px rgba(168, 85, 247, 0.3),
+    0 4px 16px rgba(0, 0, 0, 0.3);
 }
 
 /* ─── Beat Pads ────────────────────────────────── */
@@ -205,17 +427,17 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 1px;
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 12px;
-  border: none;
+  border-radius: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
   color: white;
   cursor: pointer;
-  transition: all 0.08s ease;
+  transition: all 0.06s ease;
   box-shadow:
     0 4px 12px rgba(0, 0, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
   position: relative;
   overflow: hidden;
 }
@@ -226,18 +448,56 @@ body {
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.12) 0%,
     transparent 50%
   );
   border-radius: 12px;
   pointer-events: none;
 }
 
-.beat-pad:active,
-.beat-pad.scale-90 {
+.beat-pad-active {
+  transform: scale(0.88) !important;
+  filter: brightness(1.6);
   box-shadow:
-    0 1px 4px rgba(0, 0, 0, 0.3),
-    0 0 20px rgba(255, 255, 255, 0.15);
+    0 0 24px rgba(255, 255, 255, 0.2),
+    0 1px 4px rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.beat-pad-key {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 8px;
+  font-family: monospace;
+  opacity: 0.3;
+  font-weight: bold;
+}
+
+/* ─── Step Sequencer Dots ──────────────────────── */
+
+.step-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.06);
+  transition: all 0.06s ease;
+}
+
+.step-dot-mark {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.step-dot-beat {
+  background: #a855f7;
+  box-shadow: 0 0 10px rgba(168, 85, 247, 0.8);
+  transform: scale(1.15);
+}
+
+.step-dot-sub {
+  background: #22d3ee;
+  box-shadow: 0 0 8px rgba(34, 211, 238, 0.6);
+  transform: scale(1.1);
 }
 
 /* ─── BPM Slider ───────────────────────────────── */
@@ -245,11 +505,11 @@ body {
 .bpm-slider {
   -webkit-appearance: none;
   appearance: none;
-  height: 8px;
-  border-radius: 4px;
+  height: 6px;
+  border-radius: 3px;
   background: linear-gradient(90deg, #a855f7, #22d3ee);
   outline: none;
-  opacity: 0.8;
+  opacity: 0.7;
   transition: opacity 0.15s;
 }
 
@@ -259,13 +519,13 @@ body {
 
 .bpm-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: white;
   cursor: pointer;
   box-shadow:
-    0 0 10px rgba(168, 85, 247, 0.5),
+    0 0 8px rgba(168, 85, 247, 0.5),
     0 2px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.1s;
 }
@@ -275,34 +535,13 @@ body {
 }
 
 .bpm-slider::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: white;
   cursor: pointer;
   border: none;
   box-shadow:
-    0 0 10px rgba(168, 85, 247, 0.5),
+    0 0 8px rgba(168, 85, 247, 0.5),
     0 2px 6px rgba(0, 0, 0, 0.3);
-}
-
-/* ─── Fun background gradient ──────────────────── */
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 20% 50%, rgba(168, 85, 247, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse at 80% 50%, rgba(34, 211, 238, 0.06) 0%, transparent 50%),
-    radial-gradient(ellipse at 50% 80%, rgba(236, 72, 153, 0.05) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-#__next,
-main,
-body > div {
-  position: relative;
-  z-index: 1;
 }
