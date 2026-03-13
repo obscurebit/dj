@@ -928,9 +928,11 @@ body {
 /* ─── GitHub Link ─────────────────────────────── */
 
 .github-link {
-  position: fixed;
-  bottom: 12px;
-  right: 12px;
+  position: fixed !important;
+  top: 12px !important;
+  left: 12px !important;
+  bottom: auto !important;
+  right: auto !important;
   z-index: 10;
 }
 
