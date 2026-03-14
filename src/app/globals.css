@@ -1104,25 +1104,37 @@ body {
   transform: rotateY(180deg);
 }
 
-.deck-flip-front,
-.deck-flip-back {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  transform-style: preserve-3d;
-  -webkit-transform-style: preserve-3d;
-}
-
 .deck-flip-front {
   position: relative;
-  transform: rotateY(0deg);
-  z-index: 2;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 .deck-flip-back {
   position: absolute;
   inset: 0;
   transform: rotateY(180deg);
-  z-index: 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Mobile fallback: toggle visibility since backface-visibility is broken */
+.deck-flip-front {
+  transition: visibility 0s linear 0s;
+  visibility: visible;
+}
+.deck-flip-inner-flipped .deck-flip-front {
+  visibility: hidden;
+  transition: visibility 0s linear 0.3s;
+}
+
+.deck-flip-back {
+  transition: visibility 0s linear 0.3s;
+  visibility: hidden;
+}
+.deck-flip-inner-flipped .deck-flip-back {
+  visibility: visible;
+  transition: visibility 0s linear 0s;
 }
 
 /* ─── Deck REC Button (on turntable face) ────── */
