@@ -1090,12 +1090,14 @@ body {
 
 .deck-flip-perspective {
   perspective: 800px;
+  -webkit-perspective: 800px;
 }
 
 .deck-flip-inner {
   position: relative;
   transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .deck-flip-inner-flipped {
@@ -1106,16 +1108,21 @@ body {
 .deck-flip-back {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .deck-flip-front {
   position: relative;
+  transform: rotateY(0deg);
+  z-index: 2;
 }
 
 .deck-flip-back {
   position: absolute;
   inset: 0;
   transform: rotateY(180deg);
+  z-index: 1;
 }
 
 /* ─── Deck REC Button (on turntable face) ────── */
