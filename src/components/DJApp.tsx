@@ -24,6 +24,17 @@ import {
   onBeatStep,
   setPattern,
   getPatternId,
+  recordHit,
+  isRecording,
+  startRecording,
+  stopRecording,
+  onRecordingChange,
+  getLoops,
+  toggleLoop,
+  deleteLoop,
+  clearAllLoops,
+  onLoopChange,
+  type UserLoop,
 } from "@/lib/audioEngine";
 import VINYL_DESIGNS, { type VinylDesign } from "@/lib/vinylDesigns";
 import TRACKS, { type Track } from "@/lib/tracks";
@@ -472,6 +483,84 @@ function TrackPicker({
   );
 }
 
+// ─── Loop Panel (back of turntable) ─────────────────────────────────────────
+
+function LoopPanel({ onFlipBack }: { onFlipBack: () => void }) {
+  const [loops, setLoops] = useState<UserLoop[]>(getLoops());
+  const [rec, setRec] = useState(isRecording());
+
+  useEffect(() => {
+    const offLoop = onLoopChange(() => setLoops(getLoops()));
+    const offRec = onRecordingChange((r) => setRec(r));
+    return () => { offLoop(); offRec(); };
+  }, []);
+
+  return (
+    <div className="loop-back-panel">
+      <div className="loop-back-header">
+        <div className="loop-back-title-row">
+          <span className="loop-back-led" />
+          <span className="loop-back-title">loop station</span>
+        </div>
+        <button className="loop-back-flip-btn" onClick={onFlipBack}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+            <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+          </svg>
+        </button>
+      </div>
+
+      <div className="loop-back-transport">
+        <button
+          className={`loop-back-rec-btn ${rec ? "loop-back-rec-btn-active" : ""}`}
+          onClick={() => { if (rec) stopRecording(); else startRecording(); }}
+        >
+          <span className="loop-back-rec-dot" />
+          <span>{rec ? "STOP" : "REC"}</span>
+        </button>
+        {loops.length > 0 && (
+          <button className="loop-back-clear-btn" onClick={clearAllLoops}>
+            CLEAR
+          </button>
+        )}
+      </div>
+
+      {rec && (
+        <div className="loop-back-rec-hint">
+          tap pads to record — hit stop when done
+        </div>
+      )}
+
+      <div className="loop-back-list">
+        {loops.length === 0 && !rec && (
+          <div className="loop-back-empty">
+            no loops yet — hit rec and play some pads
+          </div>
+        )}
+        {loops.map((loop) => (
+          <div key={loop.id} className={`loop-back-item ${loop.enabled ? "" : "loop-back-item-muted"}`}>
+            <button
+              className={`loop-back-toggle ${loop.enabled ? "loop-back-toggle-on" : ""}`}
+              onClick={() => toggleLoop(loop.id)}
+            />
+            <span className="loop-back-name">{loop.name}</span>
+            <div className="loop-back-steps">
+              {loop.steps.map((s, i) => (
+                <div key={i} className={`loop-back-step ${s.length > 0 ? "loop-back-step-hit" : ""}`} />
+              ))}
+            </div>
+            <button className="loop-back-delete" onClick={() => deleteLoop(loop.id)}>✕</button>
+          </div>
+        ))}
+      </div>
+
+      <div className="loop-back-screw loop-back-screw-tl" />
+      <div className="loop-back-screw loop-back-screw-tr" />
+      <div className="loop-back-screw loop-back-screw-bl" />
+      <div className="loop-back-screw loop-back-screw-br" />
+    </div>
+  );
+}
+
 // ─── Turntable ──────────────────────────────────────────────────────────────
 
 function Turntable({
@@ -494,6 +583,8 @@ function Turntable({
   const [rotation, setRotation] = useState(0);
   const [scratching, setScratching] = useState(false);
   const [scratchFlash, setScratchFlash] = useState(false);
+  const [flipped, setFlipped] = useState(false);
+  const [rec, setRec] = useState(isRecording());
   const lastAngleRef = useRef<number | null>(null);
   const scratchThrottleRef = useRef(0);
   const animRef = useRef<number>(0);
@@ -501,6 +592,10 @@ function Turntable({
   const rotationRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
   const needleRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    return onRecordingChange((r) => setRec(r));
+  }, []);
 
   useEffect(() => {
     let prev = performance.now();
@@ -580,58 +675,79 @@ function Turntable({
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <div className="deck-base">
-        <div className="platter">
-          <div
-            ref={containerRef}
-            className="vinyl-container"
-            onPointerDown={handlePointerDown}
-            onPointerMove={handlePointerMove}
-            onPointerUp={handlePointerUp}
-            onPointerCancel={handlePointerUp}
-            style={{ touchAction: "none" }}
-          >
-            <div
-              className={`vinyl-record ${scratchFlash ? "vinyl-scratch-flash" : ""}`}
-              style={{
-                transform: `rotate(${rotation}deg)`,
-                boxShadow: spinning
-                  ? `0 0 30px rgba(${vinyl.glowColor}, 0.25), 0 0 60px rgba(${vinyl.glowColor}, 0.1)`
-                  : "none",
-              }}
-            >
-              <div className="vinyl-grooves" />
+      <div className="deck-flip-perspective">
+        <div className={`deck-flip-inner ${flipped ? "deck-flip-inner-flipped" : ""}`}>
+          {/* ─── Front: Turntable ─── */}
+          <div className="deck-flip-front">
+            <div className="deck-base">
+              <div className="platter">
+                <div
+                  ref={containerRef}
+                  className="vinyl-container"
+                  onPointerDown={handlePointerDown}
+                  onPointerMove={handlePointerMove}
+                  onPointerUp={handlePointerUp}
+                  onPointerCancel={handlePointerUp}
+                  style={{ touchAction: "none" }}
+                >
+                  <div
+                    className={`vinyl-record ${scratchFlash ? "vinyl-scratch-flash" : ""}`}
+                    style={{
+                      transform: `rotate(${rotation}deg)`,
+                      boxShadow: spinning
+                        ? `0 0 30px rgba(${vinyl.glowColor}, 0.25), 0 0 60px rgba(${vinyl.glowColor}, 0.1)`
+                        : "none",
+                    }}
+                  >
+                    <div className="vinyl-grooves" />
+                    <div
+                      className="vinyl-label"
+                      style={{ background: vinyl.labelGradient }}
+                    >
+                      {artId === "dj" ? (
+                        <>
+                          <span className="vinyl-label-text">DJ</span>
+                          <span className="vinyl-label-sub">SPINNER</span>
+                        </>
+                      ) : (
+                        <VinylArtSVG artId={artId} />
+                      )}
+                    </div>
+                    <div className="vinyl-shine" />
+                  </div>
+                  {!spinning && !scratching && (
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                      <span className="text-white/15 text-[10px] font-medium tracking-[0.15em] uppercase">
+                        drag to scratch
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
               <div
-                className="vinyl-label"
-                style={{ background: vinyl.labelGradient }}
+                className="tonearm-wrapper"
+                style={{ transform: spinning ? "rotate(25deg)" : "rotate(0deg)" }}
               >
-                {artId === "dj" ? (
-                  <>
-                    <span className="vinyl-label-text">DJ</span>
-                    <span className="vinyl-label-sub">SPINNER</span>
-                  </>
-                ) : (
-                  <VinylArtSVG artId={artId} />
-                )}
+                <div className="tonearm-pivot" />
+                <div className="tonearm-arm" />
+                <div className="tonearm-head" ref={needleRef} />
               </div>
-              <div className="vinyl-shine" />
+              {/* REC button on turntable face */}
+              <button
+                className={`deck-rec-btn ${rec ? "deck-rec-btn-active" : ""}`}
+                onClick={() => setFlipped(true)}
+                title="Loop Station"
+              >
+                <span className={`deck-rec-btn-dot ${rec ? "deck-rec-btn-dot-active" : ""}`} />
+                <span className="deck-rec-btn-label">LOOPS</span>
+              </button>
             </div>
-            {!spinning && !scratching && (
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                <span className="text-white/15 text-[10px] font-medium tracking-[0.15em] uppercase">
-                  drag to scratch
-                </span>
-              </div>
-            )}
           </div>
-        </div>
-        <div
-          className="tonearm-wrapper"
-          style={{ transform: spinning ? "rotate(25deg)" : "rotate(0deg)" }}
-        >
-          <div className="tonearm-pivot" />
-          <div className="tonearm-arm" />
-          <div className="tonearm-head" ref={needleRef} />
+
+          {/* ─── Back: Loop Station ─── */}
+          <div className="deck-flip-back">
+            <LoopPanel onFlipBack={() => setFlipped(false)} />
+          </div>
         </div>
       </div>
 
@@ -716,6 +832,7 @@ function BeatPad({
   const trigger = useCallback(() => {
     getAudioContext();
     fn();
+    recordHit(fn);
     recordPadHit();
     setActive(true);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
@@ -1002,7 +1119,9 @@ export default function DJApp() {
           <div className="splash-vinyl">
             <div className="splash-vinyl-groove" />
             <div className="splash-vinyl-groove splash-vinyl-groove-2" />
-            <div className="splash-vinyl-label">dj</div>
+            <div className="splash-vinyl-label">
+              <VinylArtSVG artId="eye" />
+            </div>
           </div>
           <p className="splash-sub">scratch · tap · groove</p>
           <button onClick={handleStart} className="splash-btn">

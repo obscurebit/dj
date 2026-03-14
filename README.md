@@ -11,6 +11,7 @@ An interactive cartoon turntable toy that brings the joy of DJing to your browse
 - 🎛️ **Control the tempo** with smooth BPM adjustment from 60–200
 - 🎨 **Collect vinyl skins** — unlock 8 themed record designs
 - 🎼 **Switch between genres** — from Lo-fi Hip Hop to Funk and House
+- 🔄 **Record and layer loops** — flip the turntable to access the loop station, record pad hits into loops, and layer multiple patterns
 
 ## Quick Start
 
@@ -19,6 +20,10 @@ Click Play to start the beat, then:
 - Hit the drum pads (or use keyboard shortcuts)
 - Adjust tempo with the slider
 - Switch vinyls and tracks to explore different sounds
+- **Click the LOOPS button on the turntable** to flip it over and access the loop station:
+  - Hit REC to start recording pad hits into a loop
+  - Record multiple layers and toggle them on/off
+  - Use the Metronome track for freeform recording from scratch
 
 **Try it now:** [dj.obscurebit.com](https://dj.obscurebit.com)
 

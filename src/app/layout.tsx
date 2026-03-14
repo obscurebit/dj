@@ -17,6 +17,8 @@ export const metadata: Metadata = {
   description: "An interactive cartoon turntable toy — scratch vinyl, tap beats, drop sounds!",
   icons: {
     icon: "/vinyl-icon.svg",
+    shortcut: "/vinyl-icon.svg",
+    apple: "/vinyl-icon.svg",
   },
 };
 

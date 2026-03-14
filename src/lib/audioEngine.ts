@@ -410,9 +410,17 @@ export function startBeat(newBpm?: number) {
   currentStep = 0;
   const stepTime = (60 / bpm / 4) * 1000; // 16th notes
   beatInterval = setInterval(() => {
-    const fns = activePattern[currentStep % activePattern.length];
+    const step = currentStep % activePattern.length;
+    const fns = activePattern[step];
     fns.forEach((fn) => fn());
-    beatCallbacks.forEach((cb) => cb(currentStep % activePattern.length));
+    // Play enabled user loops
+    for (const loop of userLoops) {
+      if (loop.enabled) {
+        const loopFns = loop.steps[step % loop.steps.length];
+        loopFns.forEach((fn) => fn());
+      }
+    }
+    beatCallbacks.forEach((cb) => cb(step));
     currentStep++;
   }, stepTime);
 }
@@ -438,6 +446,113 @@ export function setBpm(newBpm: number) {
 
 export function getBpm() {
   return bpm;
+}
+
+// --- Metronome click (quiet tick for blank recording track) ---
+export function playClick(accent = false) {
+  const c = getAudioContext();
+  const t = c.currentTime;
+  const osc = c.createOscillator();
+  osc.type = "sine";
+  osc.frequency.value = accent ? 1200 : 900;
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(accent ? 0.12 : 0.06, t);
+  gain.gain.exponentialRampToValueAtTime(0.001, t + 0.03);
+  osc.connect(gain);
+  gain.connect(getMaster());
+  osc.start(t);
+  osc.stop(t + 0.03);
+}
+
+// --- Loop Recorder ---
+
+export interface UserLoop {
+  id: number;
+  name: string;
+  steps: Array<Array<() => void>>;
+  enabled: boolean;
+}
+
+let nextLoopId = 1;
+let userLoops: UserLoop[] = [];
+let recording = false;
+let recordingLoop: Array<Array<() => void>> | null = null;
+let loopChangeCallbacks: Array<() => void> = [];
+let recordingChangeCallbacks: Array<(recording: boolean) => void> = [];
+
+export function onLoopChange(cb: () => void) {
+  loopChangeCallbacks.push(cb);
+  return () => { loopChangeCallbacks = loopChangeCallbacks.filter((c) => c !== cb); };
+}
+
+function notifyLoopChange() {
+  loopChangeCallbacks.forEach((cb) => cb());
+}
+
+export function onRecordingChange(cb: (r: boolean) => void) {
+  recordingChangeCallbacks.push(cb);
+  return () => { recordingChangeCallbacks = recordingChangeCallbacks.filter((c) => c !== cb); };
+}
+
+export function isRecording() {
+  return recording;
+}
+
+export function startRecording() {
+  recording = true;
+  recordingLoop = Array.from({ length: 16 }, () => []);
+  recordingChangeCallbacks.forEach((cb) => cb(true));
+}
+
+export function stopRecording() {
+  if (recordingLoop) {
+    // Only save if something was actually recorded
+    const hasContent = recordingLoop.some((s) => s.length > 0);
+    if (hasContent) {
+      userLoops.push({
+        id: nextLoopId++,
+        name: `Loop ${userLoops.length + 1}`,
+        steps: recordingLoop,
+        enabled: true,
+      });
+      notifyLoopChange();
+    }
+  }
+  recording = false;
+  recordingLoop = null;
+  recordingChangeCallbacks.forEach((cb) => cb(false));
+}
+
+export function recordHit(fn: () => void) {
+  if (!recording || !recordingLoop) return;
+  const step = currentStep % 16;
+  recordingLoop[step].push(fn);
+}
+
+export function toggleLoop(id: number) {
+  const loop = userLoops.find((l) => l.id === id);
+  if (loop) {
+    loop.enabled = !loop.enabled;
+    notifyLoopChange();
+  }
+}
+
+export function deleteLoop(id: number) {
+  userLoops = userLoops.filter((l) => l.id !== id);
+  notifyLoopChange();
+}
+
+export function clearAllLoops() {
+  userLoops = [];
+  notifyLoopChange();
+}
+
+export function getLoops(): UserLoop[] {
+  return [...userLoops];
+}
+
+export function getCurrentStep() {
+  return currentStep % 16;
 }
 
 // --- Synth stab for fun ---

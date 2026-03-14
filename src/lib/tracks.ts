@@ -12,6 +12,7 @@ import {
   playBass,
   playHorn,
   playSynthStab,
+  playClick,
 } from "./audioEngine";
 
 export interface Track {
@@ -29,6 +30,32 @@ export interface Track {
 // ─── Genre Presets ───────────────────────────────────────────────────────────
 
 const TRACKS: Track[] = [
+  {
+    id: "metronome",
+    name: "Metronome",
+    genre: "Blank",
+    bpm: 120,
+    color: "linear-gradient(135deg, #111118, #1a1a22)",
+    artAccent: "#333",
+    pattern: [
+      [() => playClick(true)],
+      [],
+      [],
+      [],
+      [() => playClick(false)],
+      [],
+      [],
+      [],
+      [() => playClick(false)],
+      [],
+      [],
+      [],
+      [() => playClick(false)],
+      [],
+      [],
+      [],
+    ],
+  },
   {
     id: "default",
     name: "Blank Canvas",

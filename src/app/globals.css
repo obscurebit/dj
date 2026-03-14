@@ -1085,3 +1085,352 @@ body {
   border-radius: 50%;
   box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
 }
+
+/* ─── Deck 3D Flip ───────────────────────────── */
+
+.deck-flip-perspective {
+  perspective: 800px;
+}
+
+.deck-flip-inner {
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.deck-flip-inner-flipped {
+  transform: rotateY(180deg);
+}
+
+.deck-flip-front,
+.deck-flip-back {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.deck-flip-front {
+  position: relative;
+}
+
+.deck-flip-back {
+  position: absolute;
+  inset: 0;
+  transform: rotateY(180deg);
+}
+
+/* ─── Deck REC Button (on turntable face) ────── */
+
+.deck-rec-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+}
+
+.deck-rec-btn:hover {
+  background: rgba(0, 0, 0, 0.7);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: scale(1.05);
+}
+
+.deck-rec-btn-active {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.deck-rec-btn-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.4);
+  display: block;
+}
+
+.deck-rec-btn-dot-active {
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.6);
+  animation: rec-dot-blink 0.8s ease infinite;
+}
+
+.deck-rec-btn-label {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.deck-rec-btn-active .deck-rec-btn-label {
+  color: rgba(239, 68, 68, 0.8);
+}
+
+@keyframes rec-dot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── Loop Back Panel (back of turntable) ────── */
+
+.loop-back-panel {
+  width: 100%;
+  height: 100%;
+  min-height: 260px;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(30, 30, 45, 0.6), transparent 60%),
+    linear-gradient(145deg, #0d0d14, #12121e 40%, #0a0a12);
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.06);
+  padding: 16px 18px;
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.loop-back-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.loop-back-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.loop-back-led {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.5);
+}
+
+.loop-back-title {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255, 255, 255, 0.35);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.loop-back-flip-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.loop-back-flip-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.loop-back-transport {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.loop-back-rec-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.loop-back-rec-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.loop-back-rec-btn-active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.1);
+}
+
+.loop-back-rec-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(239, 68, 68, 0.35);
+  display: block;
+}
+
+.loop-back-rec-btn-active .loop-back-rec-dot {
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+  animation: rec-dot-blink 0.8s ease infinite;
+}
+
+.loop-back-clear-btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.loop-back-clear-btn:hover {
+  background: rgba(239, 68, 68, 0.08);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: rgba(239, 68, 68, 0.6);
+}
+
+.loop-back-rec-hint {
+  font-size: 9px;
+  color: rgba(239, 68, 68, 0.5);
+  text-align: center;
+  margin-bottom: 10px;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  animation: rec-dot-blink 1.2s ease infinite;
+}
+
+.loop-back-empty {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.15);
+  text-align: center;
+  padding: 20px 0;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+.loop-back-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 140px;
+  overflow-y: auto;
+}
+
+.loop-back-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.15s ease;
+}
+
+.loop-back-item-muted {
+  opacity: 0.35;
+}
+
+.loop-back-toggle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.loop-back-toggle-on {
+  background: #4ade80;
+  border-color: #4ade80;
+  box-shadow: 0 0 6px rgba(74, 222, 128, 0.4);
+}
+
+.loop-back-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.4);
+  white-space: nowrap;
+  min-width: 40px;
+  letter-spacing: 0.04em;
+}
+
+.loop-back-steps {
+  display: flex;
+  gap: 2px;
+  flex: 1;
+}
+
+.loop-back-step {
+  width: 4px;
+  height: 12px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.loop-back-step-hit {
+  background: rgba(168, 85, 247, 0.55);
+  box-shadow: 0 0 3px rgba(168, 85, 247, 0.3);
+}
+
+.loop-back-delete {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.1);
+  font-size: 9px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+}
+
+.loop-back-delete:hover {
+  color: rgba(239, 68, 68, 0.6);
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* Decorative screws */
+.loop-back-screw {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.loop-back-screw-tl { top: 8px; left: 8px; }
+.loop-back-screw-tr { top: 8px; right: 8px; }
+.loop-back-screw-bl { bottom: 8px; left: 8px; }
+.loop-back-screw-br { bottom: 8px; right: 8px; }
